@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>獨一無二的我：成長大冒險</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Google Fonts 圓體字型，適合小學生閱讀 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* 自訂童趣樣式與動畫 */
+        body {
+            font-family: 'Zen Maru Gothic', 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 45%, #E0F2FE 100%);
+            min-height: 100vh;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* 浮動動畫 */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* 彈跳出現動畫 */
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.85); }
+            70% { transform: scale(1.03); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .animate-pop {
+            animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* 搖晃提示動畫 */
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-4deg); }
+            75% { transform: rotate(4deg); }
+        }
+        .animate-wiggle {
+            animation: wiggle 0.4s ease-in-out;
+        }
+
+        /* 泡泡立體按鈕 */
+        .btn-bubble {
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 5px 0 rgba(0, 0, 0, 0.15);
+        }
+        .btn-bubble:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 0 rgba(0, 0, 0, 0.15);
+        }
+        .btn-bubble:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.15);
+        }
+
+        /* 拖放目標高亮 */
+        .drop-zone-active {
+            border-color: #F59E0B !important;
+            background-color: #FEF3C7 !important;
+            transform: scale(1.03);
+        }
+
+        /* 列印獎狀專屬樣式 */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #certificate-printable, #certificate-printable * {
+                visibility: visible;
+            }
+            #certificate-printable {
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                box-shadow: none !important;
+                border: 8px solid #F59E0B !important;
+            }
+        }
+    </style>
+</head>
+<body class="text-slate-800 pb-12">
+
+    <!-- 頂部導覽列 -->
+    <header class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-40 border-b-4 border-amber-200">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+            <!-- 標題與回首頁按鈕 -->
+            <button onclick="switchTab('home')" class="flex items-center gap-2 text-left group focus:outline-none">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-400 flex items-center justify-center text-white text-2xl shadow-md group-hover:rotate-12 transition-transform">
+                    🌟
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-black text-amber-900 tracking-wide">獨一無二的我</h1>
+                    <p class="text-xs font-bold text-amber-600">成長大冒險 • 常識與價值觀樂園</p>
+                </div>
+            </button>
+
+            <!-- 右側控制區：粵語/國語切換、音效開關、星星積分 -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- 語音語言切換 -->
+                <button id="lang-toggle-btn" onclick="toggleSpeechLang()" class="px-3 py-1.5 rounded-xl bg-sky-100 hover:bg-sky-200 text-sky-800 font-bold text-xs sm:text-sm flex items-center gap-1.5 border-2 border-sky-300 transition">
+                    <span>🗣️</span>
+                    <span id="lang-label">粵語朗讀</span>
+                </button>
+
+                <!-- 音效開關 -->
+                <button id="sound-toggle-btn" onclick="toggleSound()" class="p-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold text-sm border-2 border-amber-300 transition" title="開關音效">
+                    <span id="sound-icon">🔊</span>
+                </button>
+
+                <!-- 星星計分板 -->
+                <div class="px-3.5 py-1.5 rounded-2xl bg-gradient-to-r from-yellow-300 to-amber-300 border-2 border-amber-400 flex items-center gap-1.5 shadow-inner">
+                    <span class="text-lg">⭐</span>
+                    <span id="star-count" class="font-black text-amber-950 text-base sm:text-lg">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 關卡快速導覽標籤列 -->
+        <nav class="max-w-5xl mx-auto px-3 pb-2.5 pt-1 flex gap-2 overflow-x-auto no-scrollbar">
+            <button onclick="switchTab('home')" data-tab="home" class="nav-pill px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition bg-amber-500 text-white shadow">
+                🏠 冒險地圖
+            </button>
+            <button onclick="switchTab('encyclopedia')" data-tab="encyclopedia" class="nav-pill px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition bg-white text-slate-600 hover:bg-amber-100">
+                📖 溫習小百科
+            </button>
+            <button onclick="switchTab('level1')" data-tab="level1" class="nav-pill px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition bg-white text-slate-600 hover:bg-amber-100">
+                🧩 第一關：階段配對
+            </button>
+            <button onclick="switchTab('level2')" data-tab="level2" class="nav-pill px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition bg-white text-slate-600 hover:bg-amber-100">
+                🌻 第二關：成長小花園
+            </button>
+            <button onclick="switchTab('level3')" data-tab="level3" class="nav-pill px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition bg-white text-slate-600 hover:bg-amber-100">
+                🏆 第三關：自信獎狀
+            </button>
+        </nav>
+    </header>
+
+    <!-- 主內容區 -->
+    <main class="max-w-5xl mx-auto px-4 pt-6">
+
+        <!-- ==================== 0. 首頁：冒險地圖 ==================== -->
+        <section id="view-home" class="animate-pop">
+            <!-- 歡迎橫幅 -->
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-lg border-4 border-amber-300 relative overflow-hidden mb-8">
+                <div class="flex flex-col md:flex-row items-center gap-6">
+                    <div class="flex-1 text-center md:text-left">
+                        <span class="inline-block px-3 py-1 rounded-full bg-rose-100 text-rose-700 font-bold text-xs sm:text-sm mb-3">
+                            💖 小學常識科 • 認識自我與成長
+                        </span>
+                        <h2 class="text-2xl sm:text-4xl font-black text-slate-800 mb-3 leading-snug">
+                            歡迎來到<span class="text-orange-500">成長大冒險</span>！
+                        </h2>
+                        <p class="text-base sm:text-lg text-slate-600 font-medium leading-relaxed mb-5">
+                            在成長過程中，我們的身體會有不同的變化。每個人的成長速度都不一樣，身高、體重、外貌各異，我們不需要與別人比較，因為<strong class="text-amber-600 underline decoration-wavy">每個人都是獨一無二的</strong>！
+                        </p>
+                        <div class="flex flex-wrap justify-center md:justify-start gap-3">
+                            <button onclick="speakText('歡迎來到成長大冒險！每個人的成長速度都不一樣，身高、體重、外貌各異，我們不需要與別人作比較，因為每個人都是獨一無二的！')" class="btn-bubble px-5 py-3 rounded-2xl bg-sky-400 hover:bg-sky-500 text-white font-bold text-base flex items-center gap-2">
+                                <span>🔊</span> 聽聽老師的話
+                            </button>
+                            <button onclick="switchTab('encyclopedia')" class="btn-bubble px-6 py-3 rounded-2xl bg-amber-400 hover:bg-amber-500 text-amber-950 font-black text-base flex items-center gap-2">
+                                <span>🚀</span> 開始學習與冒險
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 可愛五階段群像 SVG 插畫 -->
+                    <div class="w-full max-w-xs sm:max-w-sm flex-shrink-0 animate-float">
+                        <svg viewBox="0 0 360 210" class="w-full h-auto drop-shadow-md">
+                            <!-- 彩虹背景弧線 -->
+                            <path d="M 20 180 A 160 140 0 0 1 340 180" fill="none" stroke="#FDE68A" stroke-width="18" stroke-linecap="round"/>
+                            <path d="M 40 180 A 140 120 0 0 1 320 180" fill="none" stroke="#BAE6FD" stroke-width="14" stroke-linecap="round"/>
+                            <path d="M 60 180 A 120 100 0 0 1 300 180" fill="none" stroke="#FBCFE8" stroke-width="12" stroke-linecap="round"/>
+                            <!-- 草地 -->
+                            <rect x="10" y="175" width="340" height="22" rx="11" fill="#86EFAC"/>
+                            <!-- 1. 嬰兒 -->
+                            <g transform="translate(42, 130)">
+                                <circle cx="20" cy="28" r="16" fill="#FDE047"/>
+                                <circle cx="20" cy="14" r="14" fill="#FFEDD5"/>
+                                <path d="M 16 2 Q 20 -3 24 2" stroke="#78350F" stroke-width="3" fill="none" stroke-linecap="round"/>
+                                <circle cx="15" cy="13" r="2" fill="#1E293B"/>
+                                <circle cx="25" cy="13" r="2" fill="#1E293B"/>
+                                <path d="M 17 19 Q 20 22 23 19" stroke="#F43F5E" stroke-width="2" fill="none" stroke-linecap="round"/>
+                            </g>
+                            <!-- 2. 兒童 -->
+                            <g transform="translate(96, 108)">
+                                <rect x="8" y="34" width="24" height="34" rx="8" fill="#38BDF8"/>
+                                <circle cx="20" cy="18" r="16" fill="#FFEDD5"/>
+                                <path d="M 5 14 Q 20 -2 35 14" fill="#451A03"/>
+                                <circle cx="14" cy="17" r="2" fill="#1E293B"/>
+                                <circle cx="26" cy="17" r="2" fill="#1E293B"/>
+                                <path d="M 15 23 Q 20 28 25 23" stroke="#1E293B" stroke-width="2" fill="none" stroke-linecap="round"/>
+                            </g>
+                            <!-- 3. 青少年 -->
+                            <g transform="translate(154, 88)">
+                                <rect x="7" y="38" width="28" height="50" rx="10" fill="#FB7185"/>
+                                <circle cx="21" cy="20" r="18" fill="#FFEDD5"/>
+                                <path d="M 4 16 Q 21 -4 38 16 L 38 28 L 33 20 L 9 20 L 4 28 Z" fill="#1E293B"/>
+                                <circle cx="15" cy="19" r="2.2" fill="#1E293B"/>
+                                <circle cx="27" cy="19" r="2.2" fill="#1E293B"/>
+                                <path d="M 16 26 Q 21 30 26 26" stroke="#1E293B" stroke-width="2" fill="none" stroke-linecap="round"/>
+                            </g>
+                            <!-- 4. 成年 -->
+                            <g transform="translate(216, 78)">
+                                <rect x="6" y="42" width="32" height="56" rx="10" fill="#34D399"/>
+                                <polygon points="22,42 18,54 22,64 26,54" fill="#FBBF24"/>
+                                <circle cx="22" cy="22" r="19" fill="#FFEDD5"/>
+                                <path d="M 4 18 Q 22 -4 40 18" fill="#1E293B"/>
+                                <circle cx="15" cy="21" r="2.2" fill="#1E293B"/>
+                                <circle cx="29" cy="21" r="2.2" fill="#1E293B"/>
+                                <path d="M 17 29 Q 22 33 27 29" stroke="#1E293B" stroke-width="2" fill="none" stroke-linecap="round"/>
+                            </g>
+                            <!-- 5. 老年 -->
+                            <g transform="translate(280, 92)">
+                                <rect x="7" y="38" width="28" height="46" rx="10" fill="#C084FC"/>
+                                <circle cx="21" cy="20" r="18" fill="#FFEDD5"/>
+                                <circle cx="21" cy="4" r="7" fill="#E2E8F0"/>
+                                <path d="M 4 17 Q 21 -2 38 17" fill="#CBD5E1"/>
+                                <circle cx="15" cy="19" r="2" fill="#1E293B"/>
+                                <circle cx="27" cy="19" r="2" fill="#1E293B"/>
+                                <path d="M 16 26 Q 21 30 26 26" stroke="#1E293B" stroke-width="2" fill="none" stroke-linecap="round"/>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 四大功能關卡卡片 -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <!-- 模組 1：溫習小百科 -->
+                <div onclick="switchTab('encyclopedia')" class="cursor-pointer bg-white rounded-3xl p-6 shadow-md border-4 border-sky-300 hover:border-sky-500 transition transform hover:-translate-y-1 flex items-start gap-4">
+                    <div class="w-16 h-16 rounded-2xl bg-sky-100 flex items-center justify-center text-4xl flex-shrink-0">
+                        📖
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-black px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-700">課前溫習</span>
+                            <span id="badge-enc" class="text-xs font-bold text-slate-400">點擊學習 →</span>
+                        </div>
+                        <h3 class="text-xl font-black text-slate-800 mt-1">溫習小百科（互動圖鑑）</h3>
+                        <p class="text-sm text-slate-600 mt-1">認識嬰兒、兒童、青少年、成年和老年五個階段的身體變化，還可以聽語音朗讀！</p>
+                    </div>
+                </div>
+
+                <!-- 模組 2：第一關 -->
+                <div onclick="switchTab('level1')" class="cursor-pointer bg-white rounded-3xl p-6 shadow-md border-4 border-emerald-300 hover:border-emerald-500 transition transform hover:-translate-y-1 flex items-start gap-4">
+                    <div class="w-16 h-16 rounded-2xl bg-emerald-100 flex items-center justify-center text-4xl flex-shrink-0">
+                        🧩
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-black px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700">第一關 • 知識挑戰</span>
+                            <span id="badge-lvl1" class="text-xs font-bold text-emerald-600">未完成</span>
+                        </div>
+                        <h3 class="text-xl font-black text-slate-800 mt-1">成長階段配對大挑戰</h3>
+                        <p class="text-sm text-slate-600 mt-1">把「長出乳齒」、「換恆齒」、「長青春痘」、「頭髮變白」等特徵配對到正確階段！</p>
+                    </div>
+                </div>
+
+                <!-- 模組 3：第二關 -->
+                <div onclick="switchTab('level2')" class="cursor-pointer bg-white rounded-3xl p-6 shadow-md border-4 border-rose-300 hover:border-rose-500 transition transform hover:-translate-y-1 flex items-start gap-4">
+                    <div class="w-16 h-16 rounded-2xl bg-rose-100 flex items-center justify-center text-4xl flex-shrink-0">
+                        🌻
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-black px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-700">第二關 • 正向價值觀</span>
+                            <span id="badge-lvl2" class="text-xs font-bold text-rose-600">未完成</span>
+                        </div>
+                        <h3 class="text-xl font-black text-slate-800 mt-1">成長小花園與校園小故事</h3>
+                        <p class="text-sm text-slate-600 mt-1">為小花朵澆水並幫助同學解決煩惱，體會每個人成長速度不同、不需要比較！</p>
+                    </div>
+                </div>
+
+                <!-- 模組 4：第三關 -->
+                <div onclick="switchTab('level3')" class="cursor-pointer bg-white rounded-3xl p-6 shadow-md border-4 border-purple-300 hover:border-purple-500 transition transform hover:-translate-y-1 flex items-start gap-4">
+                    <div class="w-16 h-16 rounded-2xl bg-purple-100 flex items-center justify-center text-4xl flex-shrink-0">
+                        🏆
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-black px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-700">第三關 • 專屬紀念</span>
+                            <span id="badge-lvl3" class="text-xs font-bold text-purple-600">製作獎狀</span>
+                        </div>
+                        <h3 class="text-xl font-black text-slate-800 mt-1">打造「獨一無二的我」自信獎狀</h3>
+                        <p class="text-sm text-slate-600 mt-1">設計你的可愛虛擬頭像、挑選你的個人優點，生成專屬電子獎狀！</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== 1. 溫習小百科（互動圖鑑） ==================== -->
+        <section id="view-encyclopedia" class="hidden animate-pop">
+            <div class="bg-white rounded-3xl p-6 shadow-lg border-4 border-sky-300 mb-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-slate-100 pb-4 mb-5">
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl font-black text-sky-900 flex items-center gap-2">
+                            <span>📖</span> 溫習小百科：人生五個成長階段
+                        </h2>
+                        <p class="text-slate-600 text-sm sm:text-base mt-1">
+                            點擊下方五個階段的按鈕，看看我們的身體在不同時期有什麼變化吧！
+                        </p>
+                    </div>
+                    <button onclick="switchTab('level1')" class="btn-bubble px-5 py-2.5 rounded-2xl bg-emerald-400 hover:bg-emerald-500 text-emerald-950 font-black text-sm whitespace-nowrap self-start sm:self-auto">
+                        溫習好了，去第一關！ ➡️
+                    </button>
+                </div>
+
+                <!-- 五個階段選擇器 -->
+                <div id="stage-tabs" class="grid grid-cols-5 gap-2 sm:gap-3 mb-6">
+                    <!-- 由 JS 動態渲染五個階段按鈕 -->
+                </div>
+
+                <!-- 階段詳細卡片展示區 -->
+                <div id="stage-detail-card" class="bg-gradient-to-br from-sky-50 to-indigo-50 rounded-3xl p-5 sm:p-8 border-2 border-sky-200">
+                    <!-- 由 JS 動態渲染內容 -->
+                </div>
+            </div>
+
+            <!-- 重點金句提示卡 -->
+            <div class="bg-amber-100 rounded-3xl p-5 border-4 border-amber-300 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="text-4xl">💡</span>
+                    <div>
+                        <h4 class="font-black text-amber-900 text-lg">小博士溫馨提示：</h4>
+                        <p class="text-amber-800 font-medium text-sm sm:text-base">
+                            雖然每個人都會經歷這五個階段，但<strong>換牙的早晚、長高的快慢、體重與外貌</strong>人人不同，這是完全正常的喔！
+                        </p>
+                    </div>
+                </div>
+                <button onclick="speakText('雖然每個人都會經歷這五個階段，但換牙的早晚、長高的快慢、體重與外貌人人不同，這是完全正常的喔！')" class="btn-bubble px-4 py-2 rounded-xl bg-amber-400 text-amber-950 font-bold text-sm whitespace-nowrap">
+                    🔊 朗讀提示
+                </button>
+            </div>
+        </section>
+
+        <!-- ==================== 2. 第一關：成長階段配對大挑戰 ==================== -->
+        <section id="view-level1" class="hidden animate-pop">
+            <div class="bg-white rounded-3xl p-6 shadow-lg border-4 border-emerald-300">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                    <div>
+                        <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-black text-xs">第一關 • 知識大考驗</span>
+                        <h2 class="text-2xl sm:text-3xl font-black text-emerald-900 mt-1">🧩 成長階段配對大挑戰</h2>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-bold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-xl">
+                            進度：<span id="l1-progress" class="text-emerald-600 font-black">0 / 8</span>
+                        </span>
+                        <button onclick="initLevel1()" class="px-3 py-1.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-sm">
+                            🔄 重新開始
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 操作說明 -->
+                <div class="bg-emerald-50 rounded-2xl p-3.5 mb-5 border border-emerald-200 flex items-center justify-between gap-2">
+                    <p class="text-sm sm:text-base text-emerald-900 font-bold">
+                        👉 玩法：先<strong>點擊</strong>（或拖拉）下方的「身體變化特徵卡」，再點擊它所屬的「人生階段箱子」！
+                    </p>
+                    <button onclick="speakText('請先點擊下方的身體變化特徵卡，再點擊它所屬的人生階段箱子！')" class="px-3 py-1.5 rounded-xl bg-emerald-200 text-emerald-900 font-bold text-xs whitespace-nowrap">
+                        🔊 聽玩法
+                    </button>
+                </div>
+
+                <!-- 待配對的特徵卡片池 -->
+                <div class="mb-6">
+                    <h3 class="text-sm font-black text-slate-500 uppercase tracking-wider mb-2.5">📦 待分類的身體變化特徵：</h3>
+                    <div id="l1-cards-pool" class="flex flex-wrap gap-2.5 min-h-[76px] p-3 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-300">
+                        <!-- 由 JS 生成特徵卡 -->
+                    </div>
+                </div>
+
+                <!-- 五個人生階段放置箱 -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3" id="l1-buckets">
+                    <!-- 由 JS 生成五個階段接收箱 -->
+                </div>
+
+                <!-- 第一關過關慶祝區（預設隱藏） -->
+                <div id="l1-complete-banner" class="hidden mt-6 bg-gradient-to-r from-emerald-400 to-teal-500 rounded-3xl p-6 text-white text-center animate-pop shadow-lg">
+                    <div class="text-5xl mb-2">🎉🌟🎊</div>
+                    <h3 class="text-2xl sm:text-3xl font-black mb-2">太厲害了！你完全掌握了成長的變化！</h3>
+                    <p class="text-emerald-50 font-medium mb-4">你獲得了 5 顆閃亮星星！準備好進入「成長小花園」了嗎？</p>
+                    <button onclick="switchTab('level2')" class="btn-bubble px-6 py-3 rounded-2xl bg-yellow-300 text-amber-950 font-black text-lg">
+                        前往第二關：成長小花園 🌻 ➡️
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== 3. 第二關：成長小花園與校園小故事 ==================== -->
+        <section id="view-level2" class="hidden animate-pop">
+            <!-- 上半部：互動澆水小花園比喻 -->
+            <div class="bg-white rounded-3xl p-6 shadow-lg border-4 border-rose-300 mb-6">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+                    <div>
+                        <span class="px-3 py-1 rounded-full bg-rose-100 text-rose-800 font-black text-xs">第二關（上）• 互動觀察</span>
+                        <h2 class="text-2xl sm:text-3xl font-black text-rose-900 mt-1">🌻 神奇的成長小花園</h2>
+                    </div>
+                    <button onclick="waterAllFlowers()" id="water-btn" class="btn-bubble px-5 py-2.5 rounded-2xl bg-sky-400 hover:bg-sky-500 text-white font-black text-base flex items-center gap-2">
+                        <span>🚿</span> 一起澆水看看！ (<span id="water-count">0</span>/3次)
+                    </button>
+                </div>
+                <p class="text-slate-600 text-sm sm:text-base mb-4">
+                    花圃裡種了四顆不同的小種子，請按<strong>「一起澆水看看！」</strong>三次，觀察每朵花是怎樣長大的！
+                </p>
+
+                <!-- 四朵不同成長速度與形態的花朵展示台 -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-gradient-to-b from-sky-100 via-sky-50 to-emerald-100 rounded-3xl p-4 border-2 border-emerald-200 items-end min-h-[230px]" id="garden-plot">
+                    <!-- JS 動態渲染四朵花 -->
+                </div>
+
+                <!-- 澆水三次後的領悟訊息 -->
+                <div id="garden-lesson" class="hidden mt-4 bg-rose-50 border-2 border-rose-300 rounded-2xl p-4 text-center animate-pop">
+                    <p class="text-rose-900 font-black text-base sm:text-lg">
+                        ✨ 你發現了嗎？向日葵長得很高、小雛菊很早就開花了、鬱金香慢慢長大、仙人掌胖嘟嘟的！<br>
+                        <span class="text-rose-600">每朵花都有自己的時間表和樣子，每一朵都一樣美麗！小朋友也一樣喔！</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- 下半部：校園小故事正向價值觀情境題 -->
+            <div class="bg-white rounded-3xl p-6 shadow-lg border-4 border-amber-300">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 font-black text-xs">第二關（下）• 校園暖心小劇場</span>
+                        <h3 class="text-xl sm:text-2xl font-black text-amber-900 mt-1">💬 遇到這些情況，我們應該怎麼想？</h3>
+                    </div>
+                    <span id="story-step-badge" class="px-3.5 py-1.5 rounded-xl bg-amber-100 text-amber-900 font-black text-sm">
+                        第 1 / 4 題
+                    </span>
+                </div>
+
+                <!-- 情境題容器 -->
+                <div id="story-container">
+                    <!-- 由 JS 動態渲染情境題 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== 4. 第三關：打造「獨一無二的我」自信獎狀 ==================== -->
+        <section id="view-level3" class="hidden animate-pop">
+            <div class="bg-white rounded-3xl p-6 shadow-lg border-4 border-purple-300">
+                <div class="mb-6">
+                    <span class="px-3 py-1 rounded-full bg-purple-100 text-purple-800 font-black text-xs">第三關 • 自信大變身</span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-purple-900 mt-1">🏆 打造「獨一無二的我」自信獎狀</h2>
+                    <p class="text-slate-600 text-sm sm:text-base mt-1">
+                        設計屬於你自己的可愛小頭像，選寫你的名字和閃亮優點，領取你的專屬獎狀吧！
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                    <!-- 左側：頭像與資料自訂表單 (5欄) -->
+                    <div class="lg:col-span-5 bg-purple-50/70 rounded-3xl p-5 border-2 border-purple-200 space-y-4">
+                        <!-- 輸入名字 -->
+                        <div>
+                            <label class="block text-sm font-black text-purple-950 mb-1">1. 你的名字或暱稱：</label>
+                            <input type="text" id="cert-name-input" maxlength="12" placeholder="例如：陳小明 / 開心果" value="獨一無二的我" oninput="updateCertificate()" class="w-full px-4 py-2.5 rounded-xl border-2 border-purple-300 focus:border-purple-500 focus:outline-none font-bold text-slate-800 bg-white">
+                        </div>
+
+                        <!-- 選擇目前成長階段 -->
+                        <div>
+                            <label class="block text-sm font-black text-purple-950 mb-1">2. 你現在處於哪個成長階段？</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button type="button" onclick="setCertStage('兒童')" class="cert-stage-btn px-3 py-2 rounded-xl font-bold text-sm border-2 bg-purple-500 text-white border-purple-600">
+                                    🧒 兒童期
+                                </button>
+                                <button type="button" onclick="setCertStage('青少年')" class="cert-stage-btn px-3 py-2 rounded-xl font-bold text-sm border-2 bg-white text-purple-900 border-purple-200">
+                                    🧑 青少年期
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 虛擬頭像造型自訂 -->
+                        <div>
+                            <label class="block text-sm font-black text-purple-950 mb-1.5">3. 設計你的可愛頭像：</label>
+                            <div class="space-y-2.5 bg-white p-3.5 rounded-2xl border border-purple-200">
+                                <!-- 髮型 -->
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-slate-600">髮型：</span>
+                                    <div class="flex gap-1.5">
+                                        <button onclick="setAvatar('hair', 'short')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-purple-100 text-xs font-bold">短髮</button>
+                                        <button onclick="setAvatar('hair', 'pigtails')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-purple-100 text-xs font-bold">雙馬尾</button>
+                                        <button onclick="setAvatar('hair', 'curly')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-purple-100 text-xs font-bold">捲捲頭</button>
+                                        <button onclick="setAvatar('hair', 'bob')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-purple-100 text-xs font-bold">齊蔭頭</button>
+                                    </div>
+                                </div>
+                                <!-- 臉部特色 -->
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-slate-600">臉部特色：</span>
+                                    <div class="flex gap-1.5">
+                                        <button onclick="setAvatar('feature', 'blush')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-purple-100 text-xs font-bold">紅蘋果臉</button>
+                                        <button onclick="setAvatar('feature', 'freckles')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-purple-100 text-xs font-bold">可愛雀斑</button>
+                                        <button onclick="setAvatar('feature', 'gaptooth')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-purple-100 text-xs font-bold">換牙缺門牙</button>
+                                    </div>
+                                </div>
+                                <!-- 眼鏡配件 -->
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-slate-600">眼鏡：</span>
+                                    <div class="flex gap-1.5">
+                                        <button onclick="setAvatar('glasses', false)" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-purple-100 text-xs font-bold">不戴眼鏡</button>
+                                        <button onclick="setAvatar('glasses', true)" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-purple-100 text-xs font-bold">圓框眼鏡 👓</button>
+                                    </div>
+                                </div>
+                                <!-- 衣服顏色 -->
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-slate-600">衣服色彩：</span>
+                                    <div class="flex gap-2">
+                                        <button onclick="setAvatar('shirt', '#38BDF8')" class="w-6 h-6 rounded-full bg-sky-400 border-2 border-white shadow"></button>
+                                        <button onclick="setAvatar('shirt', '#FB7185')" class="w-6 h-6 rounded-full bg-rose-400 border-2 border-white shadow"></button>
+                                        <button onclick="setAvatar('shirt', '#FBBF24')" class="w-6 h-6 rounded-full bg-amber-400 border-2 border-white shadow"></button>
+                                        <button onclick="setAvatar('shirt', '#34D399')" class="w-6 h-6 rounded-full bg-emerald-400 border-2 border-white shadow"></button>
+                                        <button onclick="setAvatar('shirt', '#A78BFA')" class="w-6 h-6 rounded-full bg-purple-400 border-2 border-white shadow"></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 選擇個人閃亮優點（最多選3個） -->
+                        <div>
+                            <label class="block text-sm font-black text-purple-950 mb-1.5">4. 勾選你的閃亮優點（最多選 3 項）：</label>
+                            <div id="traits-selector" class="flex flex-wrap gap-2">
+                                <!-- JS 生成優點標籤 -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右側：即時預覽電子獎狀 (7欄) -->
+                    <div class="lg:col-span-7 flex flex-col items-center">
+                        <!-- 可下載與列印的獎狀主體 -->
+                        <div id="certificate-printable" class="w-full bg-gradient-to-b from-amber-50 via-white to-amber-50 rounded-3xl p-6 sm:p-8 border-8 border-double border-amber-400 shadow-xl relative overflow-hidden text-center">
+                            <!-- 四角裝飾星星 -->
+                            <span class="absolute top-3 left-3 text-2xl">🌟</span>
+                            <span class="absolute top-3 right-3 text-2xl">🌟</span>
+                            <span class="absolute bottom-3 left-3 text-2xl">🎈</span>
+                            <span class="absolute bottom-3 right-3 text-2xl">🎈</span>
+
+                            <div class="inline-block px-4 py-1 rounded-full bg-amber-200 text-amber-900 font-black text-xs sm:text-sm tracking-widest mb-2">
+                                成長大冒險 • 榮譽嘉許狀
+                            </div>
+                            <h3 class="text-2xl sm:text-3xl font-black text-amber-800 tracking-wide mb-4">
+                                🏅 獨一無二小達人獎狀 🏅
+                            </h3>
+
+                            <!-- 虛擬頭像 SVG 畫布 -->
+                            <div class="w-32 h-32 mx-auto mb-3 rounded-full bg-gradient-to-tr from-sky-200 to-purple-200 p-1.5 shadow-inner flex items-center justify-center">
+                                <svg id="cert-avatar-svg" viewBox="0 0 120 120" class="w-full h-full rounded-full bg-white">
+                                    <!-- 由 JS 動態繪製 -->
+                                </svg>
+                            </div>
+
+                            <p class="text-base sm:text-lg font-bold text-slate-600">茲嘉許正處於 <span id="cert-stage-display" class="text-purple-600 font-black">兒童期</span> 的</p>
+                            <div id="cert-name-display" class="text-2xl sm:text-3xl font-black text-slate-900 my-1 underline decoration-amber-400 decoration-4 underline-offset-4">
+                                獨一無二的我
+                            </div>
+
+                            <!-- 個人優點展示 -->
+                            <div id="cert-traits-display" class="flex flex-wrap justify-center gap-2 my-3">
+                                <!-- 動態顯示 -->
+                            </div>
+
+                            <!-- 核心正向價值觀金句框 -->
+                            <div class="bg-amber-100/80 rounded-2xl p-4 my-4 border-2 border-amber-300">
+                                <p class="text-sm sm:text-base font-black text-amber-950 leading-relaxed">
+                                    「每個人的成長速度都不一樣，身高、體重、外貌各異，<br class="hidden sm:inline">
+                                    我不需要和別人比較，也不需要因此不開心，<br class="hidden sm:inline">
+                                    因為我是<span class="text-rose-600 text-lg">獨一無二</span>的！」
+                                </p>
+                            </div>
+
+                            <div class="flex items-center justify-between text-xs font-bold text-slate-400 pt-2 px-2">
+                                <span>頒發：成長大冒險樂園</span>
+                                <span id="cert-date-display">2026年</span>
+                            </div>
+                        </div>
+
+                        <!-- 操作按鈕區 -->
+                        <div class="flex flex-wrap justify-center gap-3 mt-5">
+                            <button onclick="speakCertificate()" class="btn-bubble px-5 py-3 rounded-2xl bg-sky-400 hover:bg-sky-500 text-white font-bold text-sm sm:text-base flex items-center gap-2">
+                                <span>🔊</span> 朗讀我的獎狀
+                            </button>
+                            <button onclick="downloadCertificateImage()" class="btn-bubble px-5 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-sm sm:text-base flex items-center gap-2">
+                                <span>💾</span> 下載獎狀圖片
+                            </button>
+                            <button onclick="window.print()" class="btn-bubble px-5 py-3 rounded-2xl bg-purple-500 hover:bg-purple-600 text-white font-black text-sm sm:text-base flex items-center gap-2">
+                                <span>🖨️</span> 列印獎狀
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 友善提示訊息框（取代 alert） -->
+    <div id="toast-box" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 transition-all duration-300 transform translate-y-4">
+        <div id="toast-content" class="px-6 py-3.5 rounded-2xl shadow-2xl font-black text-base sm:text-lg flex items-center gap-2.5 border-2">
+            <span id="toast-icon">✨</span>
+            <span id="toast-text">提示訊息</span>
+        </div>
+    </div>
+
+    <script>
+        /* ==================== 1. 音效系統 (Web Audio API) ==================== */
+        let soundEnabled = true;
+        let audioCtx = null;
+
+        function getAudioCtx() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function playTone(freq, type = 'sine', duration = 0.15, delay = 0) {
+            if (!soundEnabled) return;
+            try {
+                const ctx = getAudioCtx();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+                gain.gain.setValueAtTime(0.15, ctx.currentTime + delay);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + duration);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(ctx.currentTime + delay);
+                osc.stop(ctx.currentTime + delay + duration);
+            } catch (e) {}
+        }
+
+        function playClickSound() {
+            playTone(523.25, 'sine', 0.08, 0); // C5
+        }
+
+        function playSuccessSound() {
+            playTone(523.25, 'triangle', 0.12, 0);    // C5
+            playTone(659.25, 'triangle', 0.12, 0.1);  // E5
+            playTone(783.99, 'triangle', 0.25, 0.2);  // G5
+        }
+
+        function playGentleErrorSound() {
+            playTone(330, 'sine', 0.15, 0);
+            playTone(293.66, 'sine', 0.22, 0.12);
+        }
+
+        function playFanfareSound() {
+            const notes = [523.25, 659.25, 783.99, 1046.50];
+            notes.forEach((n, i) => playTone(n, 'triangle', 0.22, i * 0.11));
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('sound-icon').textContent = soundEnabled ? '🔊' : '🔇';
+            if (soundEnabled) playClickSound();
+        }
+
+        /* ==================== 2. 語音朗讀系統 (Web Speech API) ==================== */
+        let speechLang = 'zh-HK'; // 預設粵語，可切換 zh-TW / zh-CN
+
+        function toggleSpeechLang() {
+            playClickSound();
+            if (speechLang === 'zh-HK') {
+                speechLang = 'zh-TW';
+                document.getElementById('lang-label').textContent = '國語朗讀';
+                showToast('已切換為國語語音朗讀', '🗣️', 'bg-sky-100 text-sky-900 border-sky-300');
+            } else {
+                speechLang = 'zh-HK';
+                document.getElementById('lang-label').textContent = '粵語朗讀';
+                showToast('已切換為粵語語音朗讀', '🗣️', 'bg-sky-100 text-sky-900 border-sky-300');
+            }
+        }
+
+        function speakText(text) {
+            if (!('speechSynthesis' in window)) {
+                showToast('你的瀏覽器暫不支援語音朗讀喔', 'ℹ️', 'bg-amber-100 text-amber-900 border-amber-300');
+                return;
+            }
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = speechLang;
+            utterance.rate = 0.92; // 稍慢語速適合小學生聆聽
+            utterance.pitch = 1.08;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        /* ==================== 3. 全局狀態與提示框 ==================== */
+        let totalStars = 0;
+        const completedFlags = { l1: false, l2Garden: false, l2Stories: false };
+
+        function addStars(amount) {
+            totalStars += amount;
+            const el = document.getElementById('star-count');
+            el.textContent = totalStars;
+            el.parentElement.classList.add('scale-110');
+            setTimeout(() => el.parentElement.classList.remove('scale-110'), 250);
+        }
+
+        let toastTimer = null;
+        function showToast(text, icon = '✨', colorClass = 'bg-amber-100 text-amber-950 border-amber-400') {
+            const box = document.getElementById('toast-box');
+            const content = document.getElementById('toast-content');
+            document.getElementById('toast-text').textContent = text;
+            document.getElementById('toast-icon').textContent = icon;
+            content.className = `px-6 py-3.5 rounded-2xl shadow-2xl font-black text-base sm:text-lg flex items-center gap-2.5 border-2 ${colorClass}`;
+            
+            box.classList.remove('opacity-0', 'translate-y-4');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                box.classList.add('opacity-0', 'translate-y-4');
+            }, 2600);
+        }
+
+        function switchTab(tabName) {
+            playClickSound();
+            window.speechSynthesis && window.speechSynthesis.cancel();
+            const views = ['home', 'encyclopedia', 'level1', 'level2', 'level3'];
+            views.forEach(v => {
+                document.getElementById(`view-${v}`).classList.add('hidden');
+            });
+            document.getElementById(`view-${tabName}`).classList.remove('hidden');
+
+            // 更新頂部導覽按鈕樣式
+            document.querySelectorAll('.nav-pill').forEach(btn => {
+                if (btn.dataset.tab === tabName) {
+                    btn.className = 'nav-pill px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition bg-amber-500 text-white shadow';
+                } else {
+                    btn.className = 'nav-pill px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition bg-white text-slate-600 hover:bg-amber-100';
+                }
+            });
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /* ==================== 4. 課本核心知識庫（五個人生階段） ==================== */
+        const STAGES_DATA = [
+            {
+                id: 'baby',
+                name: '嬰兒',
+                ageHint: '約 0 - 2 歲',
+                color: 'bg-pink-100 border-pink-300 text-pink-900',
+                badgeColor: 'bg-pink-500',
+                emoji: '👶',
+                changes: [
+                    { icon: '🦷', title: '長出乳齒', desc: '大約六個月大開始，可愛的小乳齒會慢慢冒出來。' },
+                    { icon: '⚖️', title: '體重增加', desc: '喝奶和吃副食品後，身體圓滾滾地變重了。' },
+                    { icon: '📏', title: '身體長高', desc: '每天都在快快長大，很快就要換更大的衣服。' }
+                ],
+                summarySpeech: '嬰兒期。在這個階段，寶寶會長出乳齒、體重增加，身體也會慢慢長高。',
+                svg: `<svg viewBox="0 0 120 120" class="w-28 h-28 mx-auto">
+                        <circle cx="60" cy="60" r="54" fill="#FCE7F3"/>
+                        <rect x="38" y="75" width="44" height="32" rx="16" fill="#F472B6"/>
+                        <path d="M 44 75 Q 60 88 76 75" fill="#FFFFFF"/>
+                        <circle cx="60" cy="52" r="26" fill="#FFEDD5"/>
+                        <path d="M 52 27 Q 60 18 68 27" stroke="#78350F" stroke-width="4" fill="none" stroke-linecap="round"/>
+                        <circle cx="50" cy="50" r="3" fill="#1E293B"/>
+                        <circle cx="70" cy="50" r="3" fill="#1E293B"/>
+                        <circle cx="44" cy="56" r="4" fill="#FDA4AF" opacity="0.7"/>
+                        <circle cx="76" cy="56" r="4" fill="#FDA4AF" opacity="0.7"/>
+                        <path d="M 53 60 Q 60 68 67 60 Z" fill="#F43F5E"/>
+                        <rect x="57" y="60" width="6" height="4" rx="1" fill="#FFFFFF"/>
+                      </svg>`
+            },
+            {
+                id: 'child',
+                name: '兒童',
+                ageHint: '約 3 - 11 歲（就是現在的你！）',
+                color: 'bg-sky-100 border-sky-300 text-sky-900',
+                badgeColor: 'bg-sky-500',
+                emoji: '🧒',
+                changes: [
+                    { icon: '😁', title: '乳齒脫落，長出恆齒', desc: '進入換牙期啦！乳齒搖晃脫落後，會長出陪伴我們一生的恆齒。' },
+                    { icon: '⚖️', title: '體重增加', desc: '活動量變大，吃得健康，身體越來越結實。' },
+                    { icon: '📏', title: '身體長高', desc: '每年都會長高一點，不過每個同學長高的速度都不同喔！' }
+                ],
+                summarySpeech: '兒童期，也就是小學生現在的階段！乳齒會脫落並長出恆齒，體重增加，身體也會不斷長高。',
+                svg: `<svg viewBox="0 0 120 120" class="w-28 h-28 mx-auto">
+                        <circle cx="60" cy="60" r="54" fill="#E0F2FE"/>
+                        <rect x="34" y="78" width="52" height="34" rx="14" fill="#38BDF8"/>
+                        <circle cx="60" cy="52" r="26" fill="#FFEDD5"/>
+                        <path d="M 34 48 Q 60 20 86 48 L 82 36 Q 60 16 38 36 Z" fill="#1E293B"/>
+                        <circle cx="84" cy="34" r="7" fill="#FB7185"/>
+                        <circle cx="50" cy="52" r="3" fill="#1E293B"/>
+                        <circle cx="70" cy="52" r="3" fill="#1E293B"/>
+                        <path d="M 52 62 Q 60 70 68 62" stroke="#1E293B" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                      </svg>`
+            },
+            {
+                id: 'teen',
+                name: '青少年',
+                ageHint: '約 12 - 19 歲（中學哥哥姐姐）',
+                color: 'bg-amber-100 border-amber-300 text-amber-900',
+                badgeColor: 'bg-amber-500',
+                emoji: '🧑',
+                changes: [
+                    { icon: '✨', title: '容易長青春痘', desc: '因為油脂分泌變旺盛，臉上可能會長青春痘，只要保持清潔就好，不用擔心！' },
+                    { icon: '⚖️', title: '體重增加', desc: '進入快速發育期，身形和體重會有明顯變化。' },
+                    { icon: '📏', title: '身體長高', desc: '身高會快速抽高，有的人早一點長高，有的人晚一點。' }
+                ],
+                summarySpeech: '青少年期。在這個階段，臉上容易長青春痘，體重增加，身高也會快速長高。',
+                svg: `<svg viewBox="0 0 120 120" class="w-28 h-28 mx-auto">
+                        <circle cx="60" cy="60" r="54" fill="#FEF3C7"/>
+                        <rect x="32" y="78" width="56" height="34" rx="14" fill="#1E293B"/>
+                        <polygon points="52,78 60,94 68,78" fill="#FFFFFF"/>
+                        <polygon points="56,82 60,92 64,82" fill="#F43F5E"/>
+                        <circle cx="60" cy="52" r="26" fill="#FFEDD5"/>
+                        <path d="M 34 52 Q 34 24 60 24 Q 86 24 86 52 L 86 66 L 80 50 L 40 50 L 34 66 Z" fill="#1E293B"/>
+                        <circle cx="50" cy="53" r="3" fill="#1E293B"/>
+                        <circle cx="70" cy="53" r="3" fill="#1E293B"/>
+                        <circle cx="43" cy="58" r="1.8" fill="#FB7185"/>
+                        <circle cx="77" cy="58" r="1.8" fill="#FB7185"/>
+                        <path d="M 54 64 Q 60 68 66 64" stroke="#1E293B" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                      </svg>`
+            },
+            {
+                id: 'adult',
+                name: '成年',
+                ageHint: '約 20 - 59 歲（爸爸媽媽和老師）',
+                color: 'bg-emerald-100 border-emerald-300 text-emerald-900',
+                badgeColor: 'bg-emerald-500',
+                emoji: '👩‍💼',
+                changes: [
+                    { icon: '💪', title: '發育成熟', desc: '身體各部分已經發育完成，身高不再長高，精力充沛地工作和照顧家庭。' }
+                ],
+                summarySpeech: '成年期。到了這個階段，我們的身體已經發育成熟，身高也不會再長高了。',
+                svg: `<svg viewBox="0 0 120 120" class="w-28 h-28 mx-auto">
+                        <circle cx="60" cy="60" r="54" fill="#D1FAE5"/>
+                        <rect x="30" y="78" width="60" height="34" rx="14" fill="#334155"/>
+                        <polygon points="52,78 60,96 68,78" fill="#FFFFFF"/>
+                        <polygon points="58,80 60,94 62,80" fill="#10B981"/>
+                        <circle cx="60" cy="52" r="26" fill="#FFEDD5"/>
+                        <path d="M 35 46 Q 42 22 65 24 Q 85 26 85 46 L 80 38 L 40 38 Z" fill="#0F172A"/>
+                        <circle cx="50" cy="52" r="3" fill="#1E293B"/>
+                        <circle cx="70" cy="52" r="3" fill="#1E293B"/>
+                        <path d="M 53 63 Q 60 69 67 63" stroke="#1E293B" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                      </svg>`
+            },
+            {
+                id: 'elderly',
+                name: '老年',
+                ageHint: '約 60 歲以上（爺爺奶奶、公公婆婆）',
+                color: 'bg-purple-100 border-purple-300 text-purple-900',
+                badgeColor: 'bg-purple-500',
+                emoji: '👵',
+                changes: [
+                    { icon: '🦳', title: '頭髮變白', desc: '頭髮慢慢變成銀白色，臉上也會有充滿智慧的皺紋。' },
+                    { icon: '🦯', title: '身體機能下降', desc: '體力和視力不如從前，走路可能比較慢，需要我們多關心和愛護！' }
+                ],
+                summarySpeech: '老年期。爺爺奶奶的頭髮會變白，身體機能也會慢慢下降，我們要多關心和愛護長輩喔。',
+                svg: `<svg viewBox="0 0 120 120" class="w-28 h-28 mx-auto">
+                        <circle cx="60" cy="60" r="54" fill="#F3E8FF"/>
+                        <rect x="32" y="78" width="56" height="34" rx="14" fill="#A855F7"/>
+                        <circle cx="60" cy="24" r="10" fill="#CBD5E1"/>
+                        <circle cx="60" cy="52" r="26" fill="#FFEDD5"/>
+                        <path d="M 34 50 Q 60 22 86 50 L 82 40 Q 60 22 38 40 Z" fill="#E2E8F0"/>
+                        <circle cx="50" cy="52" r="3" fill="#1E293B"/>
+                        <circle cx="70" cy="52" r="3" fill="#1E293B"/>
+                        <path d="M 52 63 Q 60 69 68 63" stroke="#1E293B" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                      </svg>`
+            }
+        ];
+
+        let currentStageIndex = 0;
+
+        function renderEncyclopedia() {
+            const tabsContainer = document.getElementById('stage-tabs');
+            tabsContainer.innerHTML = STAGES_DATA.map((st, idx) => {
+                const active = idx === currentStageIndex;
+                return `
+                    <button onclick="selectStage(${idx})" class="p-2.5 sm:p-3.5 rounded-2xl border-3 transition flex flex-col items-center justify-center gap-1 ${active ? 'bg-sky-500 text-white border-sky-700 shadow-md scale-105' : 'bg-slate-50 hover:bg-sky-50 text-slate-700 border-slate-200'}">
+                        <span class="text-2xl sm:text-3xl">${st.emoji}</span>
+                        <span class="font-black text-xs sm:text-base">${st.name}</span>
+                    </button>
+                `;
+            }).join('');
+
+            const stage = STAGES_DATA[currentStageIndex];
+            const detailBox = document.getElementById('stage-detail-card');
+            detailBox.innerHTML = `
+                <div class="flex flex-col md:flex-row items-center gap-6">
+                    <div class="w-full md:w-1/3 text-center bg-white rounded-3xl p-5 shadow-sm border-2 border-sky-100">
+                        ${stage.svg}
+                        <span class="inline-block mt-3 px-3 py-1 rounded-full text-white font-black text-xs ${stage.badgeColor}">
+                            ${stage.ageHint}
+                        </span>
+                        <h3 class="text-2xl sm:text-3xl font-black text-slate-800 mt-1">${stage.name}期</h3>
+                        <button onclick="speakText('${stage.summarySpeech}')" class="mt-3 btn-bubble w-full py-2.5 rounded-xl bg-amber-400 hover:bg-amber-500 text-amber-950 font-black text-sm flex items-center justify-center gap-1.5">
+                            <span>🔊</span> 朗讀本階段特點
+                        </button>
+                    </div>
+                    <div class="w-full md:w-2/3 space-y-3">
+                        <h4 class="font-black text-sky-900 text-lg mb-2">🔍 身體有什麼變化？</h4>
+                        ${stage.changes.map(ch => `
+                            <div onclick="speakText('${ch.title}。${ch.desc}')" class="cursor-pointer bg-white hover:bg-amber-50 transition rounded-2xl p-4 border-2 border-sky-100 hover:border-amber-300 flex items-start gap-3.5 shadow-sm">
+                                <div class="w-12 h-12 rounded-xl bg-sky-100 flex items-center justify-center text-2xl flex-shrink-0">
+                                    ${ch.icon}
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <h5 class="font-black text-lg text-slate-800">${ch.title}</h5>
+                                        <span class="text-xs font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-lg">🔊 點擊聽解說</span>
+                                    </div>
+                                    <p class="text-slate-600 text-sm sm:text-base mt-0.5">${ch.desc}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectStage(idx) {
+            playClickSound();
+            currentStageIndex = idx;
+            renderEncyclopedia();
+            speakText(STAGES_DATA[idx].summarySpeech);
+        }
+
+        /* ==================== 5. 第一關：成長階段配對大挑戰 ==================== */
+        const L1_ITEMS = [
+            { id: 'c1', text: '長出乳齒', emoji: '🦷', target: 'baby', hint: '寶寶大約六個月大時會開始長出第一批牙齒喔！' },
+            { id: 'c2', text: '乳齒脫落，長出恆齒', emoji: '😁', target: 'child', hint: '小學生正處於換牙期，乳齒掉了會長出恆齒！' },
+            { id: 'c3', text: '容易長青春痘', emoji: '✨', target: 'teen', hint: '中學哥哥姐姐踏入發育期，臉上容易長青春痘。' },
+            { id: 'c4', text: '發育成熟', emoji: '💪', target: 'adult', hint: '爸爸媽媽的身體已經完全發育成熟，不會再長高了。' },
+            { id: 'c5', text: '頭髮變白', emoji: '🦳', target: 'elderly', hint: '爺爺奶奶年紀大了，頭髮會慢慢變成銀白色。' },
+            { id: 'c6', text: '身體機能下降', emoji: '🦯', target: 'elderly', hint: '長輩的體力和視力會慢慢下降，需要我們關心。' },
+            { id: 'c7', text: '兒童期的身體長高', emoji: '📏', target: 'child', hint: '小學生每年都會長高一點，需要換新校服呢！' },
+            { id: 'c8', text: '青少年期的體重增加', emoji: '⚖️', target: 'teen', hint: '青少年快速發育，身形和體重都會增加。' }
+        ];
+
+        let l1Remaining = [];
+        let l1Placed = { baby: [], child: [], teen: [], adult: [], elderly: [] };
+        let selectedCardId = null;
+
+        function initLevel1() {
+            l1Remaining = [...L1_ITEMS].sort(() => Math.random() - 0.5);
+            l1Placed = { baby: [], child: [], teen: [], adult: [], elderly: [] };
+            selectedCardId = null;
+            document.getElementById('l1-complete-banner').classList.add('hidden');
+            renderLevel1();
+        }
+
+        function renderLevel1() {
+            const matchedCount = L1_ITEMS.length - l1Remaining.length;
+            document.getElementById('l1-progress').textContent = `${matchedCount} / ${L1_ITEMS.length}`;
+
+            // 渲染上方待分類卡片
+            const pool = document.getElementById('l1-cards-pool');
+            if (l1Remaining.length === 0) {
+                pool.innerHTML = `<div class="w-full text-center py-3 text-emerald-700 font-black">🎉 全部卡片都配對成功啦！</div>`;
+            } else {
+                pool.innerHTML = l1Remaining.map(item => {
+                    const isSelected = selectedCardId === item.id;
+                    return `
+                        <button draggable="true"
+                            ondragstart="handleDragStart(event, '${item.id}')"
+                            onclick="selectL1Card('${item.id}')"
+                            class="px-4 py-2.5 rounded-2xl font-black text-sm sm:text-base flex items-center gap-2 transition cursor-pointer shadow-sm border-2 ${isSelected ? 'bg-amber-400 text-amber-950 border-amber-600 scale-105 ring-4 ring-amber-200' : 'bg-white hover:bg-amber-50 text-slate-800 border-slate-300'}">
+                            <span class="text-xl">${item.emoji}</span>
+                            <span>${item.text}</span>
+                        </button>
+                    `;
+                }).join('');
+            }
+
+            // 渲染五個階段接收箱
+            const bucketsBox = document.getElementById('l1-buckets');
+            bucketsBox.innerHTML = STAGES_DATA.map(st => {
+                const placedList = l1Placed[st.id];
+                return `
+                    <div onclick="placeCardInStage('${st.id}')"
+                         ondragover="handleDragOver(event)"
+                         ondragleave="handleDragLeave(event)"
+                         ondrop="handleDrop(event, '${st.id}')"
+                         class="cursor-pointer rounded-3xl p-3.5 border-3 transition flex flex-col justify-between min-h-[190px] ${st.color} hover:shadow-md">
+                        <div class="text-center border-b border-black/10 pb-2 mb-2">
+                            <div class="text-3xl">${st.emoji}</div>
+                            <div class="font-black text-lg">${st.name}</div>
+                            <div class="text-xs opacity-75 font-bold">${selectedCardId ? '👉 點擊放入這裡' : '接收箱'}</div>
+                        </div>
+                        <div class="space-y-1.5 flex-1">
+                            ${placedList.map(p => `
+                                <div class="bg-white/90 rounded-xl px-2.5 py-1.5 text-xs sm:text-sm font-black text-slate-800 flex items-center gap-1.5 shadow-sm animate-pop">
+                                    <span>✅</span>
+                                    <span>${p.text}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectL1Card(cardId) {
+            playClickSound();
+            selectedCardId = (selectedCardId === cardId) ? null : cardId;
+            const item = l1Remaining.find(i => i.id === cardId);
+            if (item && selectedCardId) {
+                speakText(item.text);
+            }
+            renderLevel1();
+        }
+
+        function handleDragStart(e, cardId) {
+            selectedCardId = cardId;
+            e.dataTransfer.setData('text/plain', cardId);
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drop-zone-active');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drop-zone-active');
+        }
+
+        function handleDrop(e, stageId) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drop-zone-active');
+            const cardId = e.dataTransfer.getData('text/plain') || selectedCardId;
+            if (cardId) {
+                selectedCardId = cardId;
+                placeCardInStage(stageId);
+            }
+        }
+
+        function placeCardInStage(stageId) {
+            if (!selectedCardId) {
+                showToast('請先點選一張白色的特徵卡片喔！', '👆', 'bg-sky-100 text-sky-900 border-sky-300');
+                return;
+            }
+            const cardIndex = l1Remaining.findIndex(c => c.id === selectedCardId);
+            if (cardIndex === -1) return;
+            const card = l1Remaining[cardIndex];
+
+            if (card.target === stageId) {
+                // 配對成功
+                playSuccessSound();
+                l1Remaining.splice(cardIndex, 1);
+                l1Placed[stageId].push(card);
+                selectedCardId = null;
+                showToast(`答對了！「${card.text}」屬於${STAGES_DATA.find(s => s.id === stageId).name}期！`, '🌟', 'bg-emerald-100 text-emerald-950 border-emerald-400');
+                renderLevel1();
+
+                // 檢查是否全部完成
+                if (l1Remaining.length === 0) {
+                    playFanfareSound();
+                    document.getElementById('l1-complete-banner').classList.remove('hidden');
+                    if (!completedFlags.l1) {
+                        completedFlags.l1 = true;
+                        addStars(5);
+                        document.getElementById('badge-lvl1').textContent = '已完成 ⭐';
+                    }
+                    speakText('太厲害了！你完全掌握了成長的變化！');
+                }
+            } else {
+                // 配對錯誤，給予溫柔提示
+                playGentleErrorSound();
+                showToast(`再想一想喔！${card.hint}`, '💡', 'bg-amber-100 text-amber-950 border-amber-400');
+                speakText(`再想一想喔！${card.hint}`);
+            }
+        }
+
+        /* ==================== 6. 第二關：成長小花園與校園小故事 ==================== */
+        let waterClicks = 0;
+        const FLOWERS_DATA = [
+            { name: '陽光向日葵', trait: '長得特別高大', stages: ['🌱', '🌿', '🌻'], sizes: ['text-3xl', 'text-5xl', 'text-7xl'] },
+            { name: '早開小雛菊', trait: '很早就開花了', stages: ['🌱', '🌼', '🌼'], sizes: ['text-3xl', 'text-5xl', 'text-6xl'] },
+            { name: '優雅鬱金香', trait: '慢慢長大才開花', stages: ['🌱', '🌱', '🌷'], sizes: ['text-2xl', 'text-4xl', 'text-6xl'] },
+            { name: '圓圓小仙人掌', trait: '胖嘟嘟也很可愛', stages: ['🌵', '🌵', '🌺'], sizes: ['text-3xl', 'text-4xl', 'text-6xl'] }
+        ];
+
+        function renderGarden() {
+            const plot = document.getElementById('garden-plot');
+            const stageIdx = Math.min(waterClicks, 2);
+            plot.innerHTML = FLOWERS_DATA.map(fl => `
+                <div class="bg-white/85 rounded-2xl p-3 text-center shadow-sm border border-emerald-200 flex flex-col items-center justify-end h-44 transition-all">
+                    <div class="${fl.sizes[stageIdx]} transition-all duration-500 mb-2 animate-float">
+                        ${fl.stages[stageIdx]}
+                    </div>
+                    <div class="font-black text-slate-800 text-sm">${fl.name}</div>
+                    <div class="text-xs font-bold text-emerald-700 mt-0.5">
+                        ${waterClicks >= 3 ? fl.trait : '澆水長大中...'}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function waterAllFlowers() {
+            if (waterClicks >= 3) {
+                showToast('花朵都已經開得非常燦爛囉！', '🌸', 'bg-rose-100 text-rose-900 border-rose-300');
+                return;
+            }
+            waterClicks++;
+            playSuccessSound();
+            document.getElementById('water-count').textContent = waterClicks;
+            renderGarden();
+
+            if (waterClicks === 3) {
+                document.getElementById('garden-lesson').classList.remove('hidden');
+                if (!completedFlags.l2Garden) {
+                    completedFlags.l2Garden = true;
+                    addStars(3);
+                }
+                speakText('你發現了嗎？每朵花都有自己的成長速度和樣子，每一朵都一樣美麗！小朋友也一樣喔！');
+            }
+        }
+
+        // 校園小故事 4 道正向價值觀情境題
+        const STORIES_DATA = [
+            {
+                character: '👦 小明',
+                situation: '排隊量身高時，小明發現自己比同班同學矮了一個頭，心裡有點難過。他應該怎麼想？',
+                options: [
+                    { text: '「真討厭，我是不是永遠都長不高了，好不開心！」', correct: false, feedback: '別難過喔！每個人的成長時間表不同，現在矮一點不代表以後不會長高。' },
+                    { text: '「每個人的成長速度都不一樣，我只要均衡飲食、多運動，按自己的步伐長大就好！」', correct: true, feedback: '說得太棒了！每個人的成長速度各異，不需要和別人作比較！' },
+                    { text: '「我要天天跟同學比身高，比贏了才開心。」', correct: false, feedback: '一直跟別人比較會讓自己壓力很大，接納獨一無二的自己才會快樂喔！' }
+                ]
+            },
+            {
+                character: '👧 小美',
+                situation: '小美在兒童期開始換牙，門牙剛好脫落了，有同學笑她說話「漏風」。小美該如何面對？',
+                options: [
+                    { text: '「乳齒脫落、長出恆齒是兒童期的正常成長變化，代表我正在長大呢！」', correct: true, feedback: '答對了！換牙是每個小朋友必經的成長過程，一點也不丟臉！' },
+                    { text: '「好丟臉喔，我以後都不敢在學校開口笑和說話了。」', correct: false, feedback: '千萬別這樣想！大家的乳齒都會脫落，這是長大的光榮印記呢！' },
+                    { text: '「我也去取笑其他同學的外貌。」', correct: false, feedback: '互相尊重和友善對待同學，才是成熟的小學生喔！' }
+                ]
+            },
+            {
+                character: '🧑 大雄',
+                situation: '大雄的哥哥踏入青少年期，臉上長了幾顆青春痘，覺得自己不好看。我們可以怎樣安慰他？',
+                options: [
+                    { text: '「哈哈，你的臉變成小花貓了！」', correct: false, feedback: '這樣說會讓哥哥更傷心喔，我們要學會體諒別人的成長變化。' },
+                    { text: '「這是青少年期常見的正常現象，保持臉部清潔、早睡早起就會慢慢好起來，你依然很棒！」', correct: true, feedback: '你真是一位暖心小天使！理解成長變化並給予鼓勵，非常棒！' },
+                    { text: '「你以後都不要出門見人了。」', correct: false, feedback: '長青春痘是很自然的生理現象，不需要因此自卑喔！' }
+                ]
+            },
+            {
+                character: '🏫 快樂班同學們',
+                situation: '班裡有的同學胖一點、有的瘦一點、有的高、有的矮、有的戴眼鏡。這代表什麼呢？',
+                options: [
+                    { text: '「只有長得最高最瘦的人才是完美的。」', correct: false, feedback: '不對喔！美與價值不是由高矮胖瘦決定的。' },
+                    { text: '「我們每個人都是獨一無二的，各有各的優點和特色，不需要互相比較！」', correct: true, feedback: '完全正確！每個人都是獨一無二的寶貝，尊重差異讓世界更精彩！' },
+                    { text: '「大家應該長得一模一樣才對。」', correct: false, feedback: '就像花園裡有不同的花朵一樣，每個人外貌各異才讓班級充滿色彩！' }
+                ]
+            }
+        ];
+
+        let currentStoryIdx = 0;
+        let storyAnswered = false;
+
+        function renderStory() {
+            const st = STORIES_DATA[currentStoryIdx];
+            document.getElementById('story-step-badge').textContent = `第 ${currentStoryIdx + 1} / ${STORIES_DATA.length} 題`;
+            const container = document.getElementById('story-container');
+            container.innerHTML = `
+                <div class="bg-amber-50 rounded-2xl p-5 border-2 border-amber-200 mb-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="px-3 py-1 rounded-xl bg-white font-black text-amber-900 shadow-sm">${st.character}</span>
+                        <button onclick="speakText('${st.situation}')" class="px-3 py-1 rounded-xl bg-amber-300 hover:bg-amber-400 text-amber-950 font-bold text-xs">
+                            🔊 朗讀題目
+                        </button>
+                    </div>
+                    <p class="text-base sm:text-lg font-bold text-slate-800 leading-relaxed">${st.situation}</p>
+                </div>
+
+                <div class="space-y-2.5" id="story-options-list">
+                    ${st.options.map((opt, idx) => `
+                        <button onclick="selectStoryOption(${idx})" class="w-full text-left p-4 rounded-2xl border-2 border-slate-200 hover:border-amber-400 bg-white hover:bg-amber-50/50 font-bold text-slate-700 text-sm sm:text-base transition flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center font-black text-xs flex-shrink-0">${['A','B','C'][idx]}</span>
+                            <span>${opt.text}</span>
+                        </button>
+                    `).join('')}
+                </div>
+
+                <div id="story-feedback" class="hidden mt-4 p-4 rounded-2xl border-2 animate-pop"></div>
+            `;
+        }
+
+        function selectStoryOption(optIdx) {
+            const st = STORIES_DATA[currentStoryIdx];
+            const opt = st.options[optIdx];
+            const fbBox = document.getElementById('story-feedback');
+            fbBox.classList.remove('hidden');
+
+            if (opt.correct) {
+                playSuccessSound();
+                speakText(opt.feedback);
+                const isLast = currentStoryIdx === STORIES_DATA.length - 1;
+                if (isLast && !completedFlags.l2Stories) {
+                    completedFlags.l2Stories = true;
+                    addStars(5);
+                    document.getElementById('badge-lvl2').textContent = '已完成 ⭐';
+                }
+
+                fbBox.className = 'mt-4 p-4 rounded-2xl border-2 bg-emerald-50 border-emerald-400 text-emerald-950 animate-pop flex flex-col sm:flex-row items-center justify-between gap-3';
+                fbBox.innerHTML = `
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-2xl">💖</span>
+                        <span class="font-black text-sm sm:text-base">${opt.feedback}</span>
+                    </div>
+                    ${isLast 
+                        ? `<button onclick="switchTab('level3')" class="btn-bubble px-5 py-2.5 rounded-xl bg-purple-500 text-white font-black text-sm whitespace-nowrap">領取自信獎狀 🏆 ➡️</button>`
+                        : `<button onclick="nextStory()" class="btn-bubble px-5 py-2.5 rounded-xl bg-emerald-500 text-white font-black text-sm whitespace-nowrap">下一題 ➡️</button>`
+                    }
+                `;
+            } else {
+                playGentleErrorSound();
+                speakText(opt.feedback);
+                fbBox.className = 'mt-4 p-4 rounded-2xl border-2 bg-rose-50 border-rose-300 text-rose-900 animate-pop flex items-center gap-2.5';
+                fbBox.innerHTML = `
+                    <span class="text-2xl">🤗</span>
+                    <span class="font-bold text-sm sm:text-base">${opt.feedback}（再選另一個答案試試看！）</span>
+                `;
+            }
+        }
+
+        function nextStory() {
+            playClickSound();
+            currentStoryIdx++;
+            renderStory();
+        }
+
+        /* ==================== 7. 第三關：打造「獨一無二的我」自信獎狀 ==================== */
+        const avatarState = {
+            hair: 'short',
+            feature: 'blush',
+            glasses: false,
+            shirt: '#38BDF8',
+            stage: '兒童期'
+        };
+
+        const TRAITS_LIST = [
+            '😊 笑容燦爛', '🤝 樂於助人', '📚 喜愛閱讀', '🏃 熱愛運動',
+            '🎨 充滿創意', '💖 善良體貼', '🎵 喜歡音樂', '🌟 勇敢嘗試'
+        ];
+        let selectedTraits = ['😊 笑容燦爛', '🤝 樂於助人', '🌟 勇敢嘗試'];
+
+        function initCertificateBuilder() {
+            // 渲染優點標籤按鈕
+            const container = document.getElementById('traits-selector');
+            container.innerHTML = TRAITS_LIST.map(tr => {
+                const active = selectedTraits.includes(tr);
+                return `
+                    <button onclick="toggleTrait('${tr}')" class="px-3 py-1.5 rounded-xl text-xs font-bold border-2 transition ${active ? 'bg-amber-400 text-amber-950 border-amber-500 shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:bg-amber-50'}">
+                        ${tr}
+                    </button>
+                `;
+            }).join('');
+
+            // 填入今日日期
+            const today = new Date();
+            document.getElementById('cert-date-display').textContent = `${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日`;
+
+            updateCertificate();
+        }
+
+        function toggleTrait(tr) {
+            playClickSound();
+            if (selectedTraits.includes(tr)) {
+                if (selectedTraits.length > 1) {
+                    selectedTraits = selectedTraits.filter(t => t !== tr);
+                } else {
+                    showToast('最少保留一個優點標籤喔！', '🌟');
+                }
+            } else {
+                if (selectedTraits.length >= 3) {
+                    showToast('最多可以選擇 3 個閃亮優點喔！', '✨');
+                    return;
+                }
+                selectedTraits.push(tr);
+            }
+            initCertificateBuilder();
+        }
+
+        function setAvatar(key, val) {
+            playClickSound();
+            avatarState[key] = val;
+            updateCertificate();
+        }
+
+        function setCertStage(stageName) {
+            playClickSound();
+            avatarState.stage = stageName + '期';
+            document.querySelectorAll('.cert-stage-btn').forEach(btn => {
+                if (btn.textContent.includes(stageName)) {
+                    btn.className = 'cert-stage-btn px-3 py-2 rounded-xl font-bold text-sm border-2 bg-purple-500 text-white border-purple-600';
+                } else {
+                    btn.className = 'cert-stage-btn px-3 py-2 rounded-xl font-bold text-sm border-2 bg-white text-purple-900 border-purple-200';
+                }
+            });
+            updateCertificate();
+        }
+
+        function getAvatarSVGMarkup() {
+            const { hair, feature, glasses, shirt } = avatarState;
+            let hairSvg = '';
+            if (hair === 'short') {
+                hairSvg = `<path d="M 32 54 Q 60 18 88 54 L 84 40 Q 60 18 36 40 Z" fill="#1E293B"/>`;
+            } else if (hair === 'pigtails') {
+                hairSvg = `
+                    <circle cx="26" cy="42" r="11" fill="#1E293B"/>
+                    <circle cx="94" cy="42" r="11" fill="#1E293B"/>
+                    <path d="M 32 54 Q 60 20 88 54 L 82 38 Q 60 20 38 38 Z" fill="#1E293B"/>`;
+            } else if (hair === 'curly') {
+                hairSvg = `
+                    <circle cx="36" cy="36" r="12" fill="#451A03"/>
+                    <circle cx="52" cy="28" r="13" fill="#451A03"/>
+                    <circle cx="68" cy="28" r="13" fill="#451A03"/>
+                    <circle cx="84" cy="36" r="12" fill="#451A03"/>`;
+            } else if (hair === 'bob') {
+                hairSvg = `<path d="M 30 68 L 30 46 Q 60 18 90 46 L 90 68 L 84 48 L 36 48 Z" fill="#1E293B"/>`;
+            }
+
+            let featureSvg = '';
+            if (feature === 'blush') {
+                featureSvg = `
+                    <circle cx="43" cy="62" r="4.5" fill="#FDA4AF" opacity="0.75"/>
+                    <circle cx="77" cy="62" r="4.5" fill="#FDA4AF" opacity="0.75"/>
+                    <path d="M 52 66 Q 60 74 68 66" stroke="#1E293B" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+            } else if (feature === 'freckles') {
+                featureSvg = `
+                    <circle cx="42" cy="61" r="1.5" fill="#B45309"/><circle cx="46" cy="63" r="1.5" fill="#B45309"/>
+                    <circle cx="74" cy="63" r="1.5" fill="#B45309"/><circle cx="78" cy="61" r="1.5" fill="#B45309"/>
+                    <path d="M 52 66 Q 60 74 68 66" stroke="#1E293B" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+            } else if (feature === 'gaptooth') {
+                featureSvg = `
+                    <path d="M 50 65 Q 60 76 70 65 Z" fill="#F43F5E"/>
+                    <rect x="55" y="65" width="4" height="3.5" fill="#FFFFFF"/>`;
+            }
+
+            const glassesSvg = glasses ? `
+                <circle cx="49" cy="54" r="8" fill="none" stroke="#334155" stroke-width="2.2"/>
+                <circle cx="71" cy="54" r="8" fill="none" stroke="#334155" stroke-width="2.2"/>
+                <line x1="57" y1="54" x2="63" y2="54" stroke="#334155" stroke-width="2.2"/>` : '';
+
+            return `
+                <rect x="30" y="82" width="60" height="38" rx="16" fill="${shirt}"/>
+                <circle cx="60" cy="56" r="27" fill="#FFEDD5"/>
+                ${hairSvg}
+                <circle cx="49" cy="54" r="3" fill="#1E293B"/>
+                <circle cx="71" cy="54" r="3" fill="#1E293B"/>
+                ${glassesSvg}
+                ${featureSvg}
+            `;
+        }
+
+        function updateCertificate() {
+            const nameVal = document.getElementById('cert-name-input').value.trim() || '獨一無二的我';
+            document.getElementById('cert-name-display').textContent = nameVal;
+            document.getElementById('cert-stage-display').textContent = avatarState.stage;
+            document.getElementById('cert-avatar-svg').innerHTML = getAvatarSVGMarkup();
+
+            document.getElementById('cert-traits-display').innerHTML = selectedTraits.map(t => `
+                <span class="px-3 py-1 rounded-full bg-purple-100 text-purple-900 font-black text-xs sm:text-sm border border-purple-300">
+                    ${t}
+                </span>
+            `).join('');
+        }
+
+        function speakCertificate() {
+            const nameVal = document.getElementById('cert-name-input').value.trim() || '獨一無二的我';
+            const text = `獨一無二小達人獎狀！茲嘉許正處於${avatarState.stage}的${nameVal}！每個人的成長速度都不一樣，身高、體重、外貌各異，我不需要和別人比較，也不需要因此不開心，因為我是獨一無二的！`;
+            speakText(text);
+        }
+
+        // 使用純 Canvas 繪製高解析度獎狀並觸發下載，確保離線可用且無外部依賴
+        function downloadCertificateImage() {
+            playFanfareSound();
+            const canvas = document.createElement('canvas');
+            canvas.width = 900;
+            canvas.height = 640;
+            const ctx = canvas.getContext('2d');
+
+            // 背景漸層
+            const grad = ctx.createLinearGradient(0, 0, 0, 640);
+            grad.addColorStop(0, '#FFFBEB');
+            grad.addColorStop(0.5, '#FFFFFF');
+            grad.addColorStop(1, '#FEF3C7');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 900, 640);
+
+            // 雙層金色邊框
+            ctx.strokeStyle = '#F59E0B';
+            ctx.lineWidth = 14;
+            ctx.strokeRect(24, 24, 852, 592);
+            ctx.lineWidth = 4;
+            ctx.strokeRect(42, 42, 816, 556);
+
+            // 標題文字
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#B45309';
+            ctx.font = 'bold 24px sans-serif';
+            ctx.fillText('🌟 成長大冒險 • 榮譽嘉許狀 🌟', 450, 95);
+
+            ctx.fillStyle = '#92400E';
+            ctx.font = '900 44px sans-serif';
+            ctx.fillText('🏅 獨一無二小達人獎狀 🏅', 450, 155);
+
+            const nameVal = document.getElementById('cert-name-input').value.trim() || '獨一無二的我';
+            ctx.fillStyle = '#475569';
+            ctx.font = 'bold 24px sans-serif';
+            ctx.fillText(`茲嘉許正處於【${avatarState.stage}】的`, 450, 215);
+
+            ctx.fillStyle = '#0F172A';
+            ctx.font = '900 48px sans-serif';
+            ctx.fillText(nameVal, 450, 280);
+
+            // 優點標籤
+            ctx.fillStyle = '#6D28D9';
+            ctx.font = 'bold 24px sans-serif';
+            ctx.fillText(`閃亮優點：${selectedTraits.join('  •  ')}`, 450, 340);
+
+            // 金句底框
+            ctx.fillStyle = '#FEF3C7';
+            ctx.beginPath();
+            ctx.roundRect(110, 375, 680, 145, 24);
+            ctx.fill();
+            ctx.strokeStyle = '#FBBF24';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            ctx.fillStyle = '#78350F';
+            ctx.font = 'bold 23px sans-serif';
+            ctx.fillText('「每個人的成長速度都不一樣，身高、體重、外貌各異，', 450, 422);
+            ctx.fillText('我不需要和別人比較，也不需要因此不開心，', 450, 460);
+            ctx.fillStyle = '#E11D48';
+            ctx.font = '900 26px sans-serif';
+            ctx.fillText('因為我是獨一無二的！」', 450, 500);
+
+            // 底部日期
+            ctx.fillStyle = '#94A3B8';
+            ctx.font = 'bold 18px sans-serif';
+            ctx.fillText(`頒發單位：成長大冒險樂園   |   ${document.getElementById('cert-date-display').textContent}`, 450, 568);
+
+            // 下載 PNG
+            const link = document.createElement('a');
+            link.download = `獨一無二小達人獎狀_${nameVal}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+
+            showToast('專屬自信獎狀已下載儲存！', '🎉', 'bg-emerald-100 text-emerald-950 border-emerald-400');
+        }
+
+        /* ==================== 8. 初始化啟動 ==================== */
+        window.onload = function() {
+            renderEncyclopedia();
+            initLevel1();
+            renderGarden();
+            renderStory();
+            initCertificateBuilder();
+        };
+    </script>
+</body>
+</html>
